@@ -12,13 +12,13 @@ void* memManager(VM* vm, void* ptr, uint32_t oldSize, uint32_t newSize) {
    //累计系统分配的总内存
    vm->allocatedBytes += newSize - oldSize;
 
-   //避免realloc(NULL, 0)定义的新地址,此地址不能被释放
+    //避免realloc(NULL, 0)定义的新地址,此地址不能被释放
    if (newSize == 0) {
       free(ptr);
       return NULL;
    }
 
-   return realloc(ptr, newSize);
+   return realloc(ptr, newSize); 
 }
 
 // 找出大于等于v最近的2次幂
@@ -42,37 +42,37 @@ DEFINE_BUFFER_METHOD(Byte)
 void symbolTableClear(VM* vm, SymbolTable* buffer) {
    uint32_t idx = 0;
    while (idx < buffer->count) {
-      memManager(vm, buffer->datas[idx++].str, 0, 0);
+      memManager(vm, buffer->datas[idx++].str, 0, 0); 
    }
    StringBufferClear(vm, buffer);
 }
 
 //通用报错函数
-void errorReport(void* parser,
+void errorReport(void* parser, 
       ErrorType errorType, const char* fmt, ...) {
-   char buffer[DEFAULT_BUFFER_SIZE] = {'\0'};
+   char buffer[DEFAULT_BUfFER_SIZE] = {'\0'};
    va_list ap;
    va_start(ap, fmt);
-   vsnprintf(buffer, DEFAULT_BUFFER_SIZE, fmt, ap);
+   vsnprintf(buffer, DEFAULT_BUfFER_SIZE, fmt, ap);
    va_end(ap);
 
    switch (errorType) {
-      case ERROR_IO;
+      case ERROR_IO:
       case ERROR_MEM:
-         fprintf(stderr, "%s:%d In function %s():%s\n",
-               __FILE__, __LINE__, __func__, buffer);
-         break;
+	      fprintf(stderr, "%s:%d In function %s():%s\n",
+	       __FILE__, __LINE__, __func__, buffer);
+	      break;
       case ERROR_LEX:
       case ERROR_COMPILE:
-         ASSERT(parser != NULL, "parser is null!");
-         fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->file,
-               ((Parser*)parser)->preToken.lineNo, buffer);
-         break;
+	      ASSERT(parser != NULL, "parser is null!");
+	      fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->file,
+	         ((Parser*)parser)->preToken.lineNo, buffer);
+	      break;
       case ERROR_RUNTIME:
-         fprintf(stderr, "%s\n", buffer);
-         break;
+	      fprintf(stderr, "%s\n", buffer);
+	      break;
       default:
-         NOT_REACHED();
+	      NOT_REACHED();
    }
    exit(1);
 }

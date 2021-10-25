@@ -1,5 +1,5 @@
 /.idea
 *.iml
-/.vscode
+.vscode
 *.o
 spr

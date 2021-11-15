@@ -108,7 +108,6 @@ typedef struct {
 static uint32_t addConstant(CompileUnit* cu, Value constant);
 static void expression(CompileUnit* cu, BindPower rbp);
 static void compileProgram(CompileUnit* cu);
-static void infixOperator(CompileUnit* cu, bool canAssign UNUSED);
 
 //初始化CompileUnit
 static void initCompileUnit(Parser* parser, CompileUnit* cu,
@@ -871,35 +870,6 @@ static void emitMethodCall(CompileUnit* cu, const char* name,
    }
 }
 
-//"this".nud()
-static void this(CompileUnit* cu, bool canAssign UNUSED) {
-   if (getEnclosingClassBK(cu) == NULL) {
-      COMPILE_ERROR(cu->curParser, "this must be inside a class method!");
-   }
-   emitLoadThis(cu);
-}
-
-//"super".nud()
-static void super(CompileUnit* cu, bool canAssign UNUSED) {
-   ClassBookKeep* enclosingClassBK = getEnclosingClassBK(cu);
-   if (enclosingClassBK == NULL) {
-      COMPILE_ERROR(cu->curParser, "can`t invoke super outside a class method!");
-   }
-
-   //此处加载this,是保证参数args[0]始终是this对象,尽管对基类调用无用
-   emitLoadThis(cu);
-
-   //判断形式super.methodname()
-   if (matchToken(cu->curParser, TOKEN_DOT)) {
-      consumeCurToken(cu->curParser, TOKEN_ID, "expect name after '.'!");
-      emitMethodCall(cu, cu->curParser->preToken.start,
-            cu->curParser->preToken.length, OPCODE_SUPER0, canAssign);
-   } else {
-      //super():调用基类中与关键字super所在子类方法同名的方法
-      emitGetterMethodCall(cu, enclosingClassBK->signature, OPCODE_SUPER0); 
-   }
-}
-
 //添加常量并返回其索引
 static uint32_t addConstant(CompileUnit* cu, Value constant) {
    ValueBufferAdd(cu->curParser->vm, &cu->fn->constants, constant);
@@ -1178,10 +1148,6 @@ SymbolBindRule Rules[] = {
    /* TOKEN_RETURN */               UNUSED_RULE,
    /* TOKEN_NULL */                 PREFIX_SYMBOL(null),
    /* TOKEN_CLASS */                UNUSED_RULE,
-   /* TOKEN_THIS */                 PREFIX_SYMBOL(this),
-   /* TOKEN_STATIC */               UNUSED_RULE,
-   /* TOKEN_IS */                   INFIX_OPERATOR("is", BP_IS),
-   /* TOKEN_SUPER */                PREFIX_SYMBOL(super),
 };
 
 //语法分析的核心

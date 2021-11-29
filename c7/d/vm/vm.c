@@ -633,7 +633,7 @@ VMResult executeInstruction(VM* vm, register ObjThread* curThread) {
          closeUpvalue(curThread, curThread->esp - 1);
          DROP();   //弹出栈顶局部变量
          LOOP();
-         
+
       CASE(RETURN): {
          //栈顶: 返回值
 
@@ -696,7 +696,7 @@ VMResult executeInstruction(VM* vm, register ObjThread* curThread) {
          //指令流: 2字节待创建闭包的函数在常量表中的索引+函数所用的upvalue数 * 2 
 
          //endCompileUnit已经将闭包函数添加进了常量表
-         ObjFn* objFn =        VALUE_TO_OBJFN(fn->constants.datas[READ_SHORT()]);
+         ObjFn* objFn = VALUE_TO_OBJFN(fn->constants.datas[READ_SHORT()]);
          ObjClosure* objClosure = newObjClosure(vm, objFn);
          //将创建好的闭包的value结构压到栈顶,
          //后续会有函数如defineMethod从栈底取出

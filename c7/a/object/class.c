@@ -35,7 +35,7 @@ bool valueIsEqual(Value a, Value b) {
       ObjString* strA = VALUE_TO_OBJSTR(a);
       ObjString* strB = VALUE_TO_OBJSTR(b);
       return (strA->value.length == strB->value.length &&
-            memcmp(strA->value.start, strB->value.start, strA->value.length));
+            memcmp(strA->value.start, strB->value.start, strA->value.length) == 0);
    }
 
    //若对象同为range
